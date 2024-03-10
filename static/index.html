@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coffee Station Simulation</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Coffee Station Simulation</h1>
+
+        <div class="section">
+            <h2>Available Entities</h2>
+            <ul id="available-entities"></ul>
+            <button id="add-entity-btn">Add Entity</button>
+        </div>
+
+        <div class="section">
+            <h2>Coffee Station Entities</h2>
+            <ul id="coffee-station-entities"></ul>
+        </div>
+
+        <div class="section">
+            <h2>Coffee Station Report</h2>
+            <pre id="coffee-station-report"></pre>
+            <button id="refresh-report-btn">Refresh Report</button>
+        </div>
+
+        <div class="section">
+            <canvas id="coffee-station-chart"></canvas>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
