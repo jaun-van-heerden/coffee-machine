@@ -5,6 +5,8 @@ import simpy
 import asyncio
 from CoffeeMachine import CoffeeMachine, Container
 
+import inspect
+
 app = FastAPI()
 
 # Mount the static files directory
@@ -87,19 +89,45 @@ class CoffeeStation:
         return entity_id
 
     # def get_entities(self):
-    #     return [
-    #         {"id": entity_id, "type": entity.__class__.__name__, "methods": dir(entity)}
-    #         for entity_id, entity in self.entities.items()
-    #     ]
+    #     entities = []
+    #     for entity_id, entity in self.entities.items():
+    #         entity_dict = {
+    #             "id": entity_id,
+    #             "type": entity.__class__.__name__,
+    #             "methods": [m for m in dir(entity) if not m.startswith("__")]
+    #         }
+    #         entities.append(entity_dict)
+    #     return entities
     
+    
+
     def get_entities(self):
         entities = []
         for entity_id, entity in self.entities.items():
             entity_dict = {
                 "id": entity_id,
                 "type": entity.__class__.__name__,
-                "methods": dir(entity)
+                "methods": []
             }
+            for method_name in [m for m in dir(entity) if not m.startswith("__")]:
+                method = getattr(entity, method_name)
+                if callable(method):
+                    method_dict = {
+                        "name": method_name,
+                        "parameters": []
+                    }
+                    arg_spec = inspect.getfullargspec(method)
+                    for arg_name in arg_spec.args:
+                        if arg_name != "self":
+                            param_dict = {
+                                "name": arg_name,
+                                "required": True
+                            }
+                            if arg_spec.defaults and arg_name in arg_spec.args[-len(arg_spec.defaults):]:
+                                param_dict["required"] = False
+                                param_dict["default"] = arg_spec.defaults[arg_spec.args[-len(arg_spec.defaults):].index(arg_name)]
+                            method_dict["parameters"].append(param_dict)
+                    entity_dict["methods"].append(method_dict)
             entities.append(entity_dict)
         return entities
 
@@ -112,7 +140,10 @@ class CoffeeStation:
             entity_report = {}
             for attr, value in entity.__dict__.items():
                 if not attr.startswith("_"):  # Exclude private attributes
-                    entity_report[attr] = value
+                    if isinstance(value, (int, float, str, bool, list, dict)):
+                        entity_report[attr] = value
+                    else:
+                        entity_report[attr] = str(value)
             report[entity_id] = entity_report
         return report
 

@@ -42,23 +42,87 @@ async function fetchCoffeeStationEntities() {
 }
 
 // Function to display coffee station entities in the HTML
+// function displayCoffeeStationEntities(entities) {
+//     const coffeeStationEntitiesList = document.getElementById('coffee-station-entities');
+//     coffeeStationEntitiesList.innerHTML = '';
+
+//     entities.forEach(entity => {
+//         const listItem = document.createElement('li');
+//         listItem.textContent = `${entity.id} (${entity.type})`;
+
+//         const methodButtons = document.createElement('div');
+//         entity.methods.forEach(method => {
+//             const button = document.createElement('button');
+//             button.textContent = method;
+//             button.addEventListener('click', () => callEntityMethod(entity.id, method));
+//             methodButtons.appendChild(button);
+//         });
+
+//         listItem.appendChild(methodButtons);
+//         coffeeStationEntitiesList.appendChild(listItem);
+//     });
+// }
+
+// Function to display coffee station entities in the HTML
 function displayCoffeeStationEntities(entities) {
     const coffeeStationEntitiesList = document.getElementById('coffee-station-entities');
     coffeeStationEntitiesList.innerHTML = '';
+
+    console.log(entities);
+    console.log("H");
 
     entities.forEach(entity => {
         const listItem = document.createElement('li');
         listItem.textContent = `${entity.id} (${entity.type})`;
 
-        const methodButtons = document.createElement('div');
+        const methodContainer = document.createElement('div');
         entity.methods.forEach(method => {
-            const button = document.createElement('button');
-            button.textContent = method;
-            button.addEventListener('click', () => callEntityMethod(entity.id, method));
-            methodButtons.appendChild(button);
+            const methodDiv = document.createElement('div');
+            methodDiv.classList.add('method');
+
+            const methodName = document.createElement('span');
+            methodName.textContent = method.name;
+            methodDiv.appendChild(methodName);
+
+            const toggleButton = document.createElement('button');
+            toggleButton.textContent = 'Show Arguments';
+            toggleButton.addEventListener('click', () => {
+                argumentsDiv.style.display = argumentsDiv.style.display === 'none' ? 'block' : 'none';
+            });
+            methodDiv.appendChild(toggleButton);
+
+            const argumentsDiv = document.createElement('div');
+            argumentsDiv.classList.add('arguments');
+            argumentsDiv.style.display = 'none';
+
+            method.parameters.forEach(param => {
+                const paramDiv = document.createElement('div');
+                paramDiv.textContent = `${param.name} (${param.required ? 'Required' : 'Optional'})`;
+                if (!param.required && param.default !== undefined) {
+                    paramDiv.textContent += ` - Default: ${param.default}`;
+                }
+                argumentsDiv.appendChild(paramDiv);
+            });
+
+            const executeButton = document.createElement('button');
+            executeButton.textContent = 'Execute';
+            executeButton.addEventListener('click', () => {
+                const config = {};
+                method.parameters.forEach(param => {
+                    const value = prompt(`Enter value for ${param.name}:`);
+                    if (value !== null) {
+                        config[param.name] = value;
+                    }
+                });
+                callEntityMethod(entity.id, method.name, config);
+            });
+            argumentsDiv.appendChild(executeButton);
+
+            methodDiv.appendChild(argumentsDiv);
+            methodContainer.appendChild(methodDiv);
         });
 
-        listItem.appendChild(methodButtons);
+        listItem.appendChild(methodContainer);
         coffeeStationEntitiesList.appendChild(listItem);
     });
 }
@@ -121,6 +185,7 @@ function createChart(report) {
 
 // Function to update coffee station entities
 async function updateCoffeeStationEntities() {
+    console.log("HERE");
     const coffeeStationEntities = await fetchCoffeeStationEntities();
     displayCoffeeStationEntities(coffeeStationEntities);
 }
@@ -129,7 +194,7 @@ async function updateCoffeeStationEntities() {
 async function updateCoffeeStationReport() {
     const coffeeStationReport = await fetchCoffeeStationReport();
     displayCoffeeStationReport(coffeeStationReport);
-    createChart(coffeeStationReport);
+    // createChart(coffeeStationReport);
 }
 
 // Event listener for add entity button
@@ -146,3 +211,5 @@ document.getElementById('refresh-report-btn').addEventListener('click', updateCo
 // Initial update of coffee station entities and report
 updateCoffeeStationEntities();
 updateCoffeeStationReport();
+
+console.log("Start");

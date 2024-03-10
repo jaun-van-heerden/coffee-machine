@@ -42,7 +42,7 @@ button {
     border-radius: 5px;
     padding: 10px 20px;
     margin: 4px 4px 4px 4px;
-    cursor: pointer;
+    cursor: pointer; 
 }
 
 button:hover {

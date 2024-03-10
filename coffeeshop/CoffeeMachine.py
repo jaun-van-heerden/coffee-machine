@@ -1,3 +1,6 @@
+import WaterContainer
+
+
 from enum import Enum
 
 class MachineStatus(Enum):
@@ -33,9 +36,13 @@ class Container:
 class CoffeeMachine:
     def __init__(self, env):
         self.env = env
-        self.water_container = None
-        self.coffee_grinds_container = None
-        self.spent_grinds_container = None
+
+        # SLOTS
+        self.water_container_slot = None
+        self.coffee_grinds_container_slot = None
+        self.spent_grinds_container_slot = None
+
+
         self.steam_pressure = 0
         self.temperature = 20  # Initial room temperature
         self.hours_total = 0
@@ -44,24 +51,32 @@ class CoffeeMachine:
         self.amps = 0
         self.status = MachineStatus.OFF
 
-    def add_water_container(self, container):
-        self.water_container = container
 
-    def add_coffee_grinds_container(self, container):
-        self.coffee_grinds_container = container
+    def connect(self, component):
+        if type(component) == WaterContainer:
+            if self.water_container_slot is None:
+                return (False, f"{type(component)} Already in slot")
+            self.water_container_slot = component
+        else:
+            return (False, f"{type(component)} No compatible slot")
 
-    def add_spent_grinds_container(self, container):
-        self.spent_grinds_container = container
+
+    def heating_element_loop(self):
+        while True:
+            ...
+            # if not MachineStatus.BREWING:
+            #     self.
+
 
     def brew(self, duration):
-        if self.status != MachineStatus.OFF and self.coffee_grinds_container is not None and self.water_container is not None:
-            if self.coffee_grinds_container.contents >= 10 and self.water_container.contents >= 0.2:
+        if self.status != MachineStatus.OFF and self.coffee_grinds_container_slot is not None and self.water_container_slot is not None:
+            if self.coffee_grinds_container.contents >= 10 and self.water_container_slot.contents >= 0.2:
                 self.status = MachineStatus.BREWING
                 self.temperature += 10  # Increase temperature while brewing
                 self.amps = 10  # Assuming constant current during brewing
                 self.kilowatts_total += self.amps * 220 * duration / 3600  # Calculate energy consumption in kWh
                 yield self.env.timeout(duration)
-                self.water_container.remove(0.2)  # Brewing consumes 0.2 litres of water
+                self.water_container_slot.remove(0.2)  # Brewing consumes 0.2 litres of water
                 self.coffee_grinds_container.remove(10)  # Brewing consumes 10 grams of coffee grinds
                 if self.spent_grinds_container is not None:
                     self.spent_grinds_container.add(10)  # Add spent grinds to the container
