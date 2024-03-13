@@ -75,11 +75,11 @@ class CoffeeStation:
         if entity_type == "coffee_machine":
             entity = CoffeeMachine(self.env)
         elif entity_type == "water_container":
-            entity = Container(entity_config.config.get("capacity", 1.0))
+            entity = Container(self.env)
         elif entity_type == "coffee_grinds_container":
-            entity = Container(entity_config.config.get("capacity", 500.0))
+            entity = Container(self.env)
         elif entity_type == "spent_grinds_container":
-            entity = Container(entity_config.config.get("capacity", 1000.0))
+            entity = Container(self.env)
         # elif entity_type == "milk_frother":
             # entity = MilkFrother(self.env)
         else:
@@ -88,17 +88,6 @@ class CoffeeStation:
         self.entities[entity_id] = entity
         return entity_id
 
-    # def get_entities(self):
-    #     entities = []
-    #     for entity_id, entity in self.entities.items():
-    #         entity_dict = {
-    #             "id": entity_id,
-    #             "type": entity.__class__.__name__,
-    #             "methods": [m for m in dir(entity) if not m.startswith("__")]
-    #         }
-    #         entities.append(entity_dict)
-    #     return entities
-    
     
 
     def get_entities(self):
